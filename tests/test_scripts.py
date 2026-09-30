@@ -233,6 +233,132 @@ class InstallerTest(unittest.TestCase):
             shutil.rmtree(home, ignore_errors=True)
 
 
+MEMORY = os.path.join(ROOT, "skills", "persistent-memory", "scripts", "memory.py")
+AFFECTED = os.path.join(ROOT, "skills", "test-impact", "scripts", "affected_tests.py")
+BULK = os.path.join(ROOT, "skills", "bulk-edit", "scripts", "bulk_replace.py")
+AUDIT = os.path.join(ROOT, "skills", "context-audit", "scripts", "context_audit.py")
+
+
+class GitRepoCase(unittest.TestCase):
+    files = {}
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.home = tempfile.mkdtemp()
+        for rel, body in self.files.items():
+            path = os.path.join(self.dir, rel)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(textwrap.dedent(body).lstrip("\n"))
+        subprocess.run(["git", "init", "-q"], cwd=self.dir, check=True)
+        subprocess.run(["git", "add", "-A"], cwd=self.dir, check=True)
+        subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "init"],
+                       cwd=self.dir, check=True)
+        self.env = dict(os.environ, HOME=self.home, USERPROFILE=self.home,
+                        AGENT_MEMORY_HOME=os.path.join(self.home, ".agents"))
+
+    def tearDown(self):
+        shutil.rmtree(self.dir, ignore_errors=True)
+        shutil.rmtree(self.home, ignore_errors=True)
+
+    def run_py(self, args, check=True):
+        r = subprocess.run([sys.executable] + args, cwd=self.dir, env=self.env, stdout=subprocess.PIPE,
+                           stderr=subprocess.STDOUT, universal_newlines=True)
+        if check and r.returncode != 0:
+            raise AssertionError("exit %d: %s" % (r.returncode, r.stdout))
+        return r
+
+
+class MemoryTest(GitRepoCase):
+    files = {"src/auth.py": "def refresh():\n    pass\n", "jest.config.js": "module.exports = {}\n"}
+
+    def test_add_recall_dedupe_stale_forget(self):
+        self.assertIn("saved p1", self.run_py([MEMORY, "add", "Single test: pytest -q tests/test_auth.py::test_refresh",
+                                               "--kind", "cmd", "--tags", "test"]).stdout)
+        self.assertIn("saved p2", self.run_py([MEMORY, "add", "refresh() swallows 401 errors, root cause of logout bug",
+                                               "--kind", "gotcha", "--files", "src/auth.py"]).stdout)
+        self.assertIn("saved g1", self.run_py([MEMORY, "add", "User prefers pnpm", "--kind", "pref", "--global"]).stdout)
+        self.assertIn("updated p1", self.run_py([MEMORY, "add", "single test: pytest -q tests/test_auth.py::test_refresh -x",
+                                                 "--kind", "cmd"]).stdout)
+        out = self.run_py([MEMORY, "recall", "how to run the auth test"]).stdout
+        self.assertTrue(out.startswith("p1 [cmd]"), out)
+        out = self.run_py([MEMORY, "recall", "logout 401"]).stdout
+        self.assertIn("p2 [gotcha]", out)
+        self.assertNotIn("!! verify", out)
+        brief = self.run_py([MEMORY, "brief"]).stdout
+        self.assertIn("2 project + 1 global", brief)
+        self.assertLess(brief.index("g1 [pref]"), brief.index("p2 [gotcha]"))  # prefs first
+        with open(os.path.join(self.dir, "src", "auth.py"), "a") as fh:
+            fh.write("# changed\n")
+        self.assertIn("!! verify: src/auth.py (changed)", self.run_py([MEMORY, "stale"]).stdout)
+        self.run_py([MEMORY, "update", "p2", "refresh() now retries once on 401"])
+        self.assertNotIn("!! verify", self.run_py([MEMORY, "recall", "refresh 401"]).stdout)
+        self.assertIn("removed p1", self.run_py([MEMORY, "forget", "p1"]).stdout)
+        self.assertEqual(1, self.run_py([MEMORY, "recall", "pytest"], check=False).returncode)
+        with open(os.path.join(self.dir, ".codemap", ".gitignore")) as fh:
+            self.assertIn("!memory.jsonl", fh.read())
+
+
+class AffectedTestsTest(GitRepoCase):
+    files = {
+        "src/shop/parser.py": "def parse(): pass\n",
+        "src/shop/utils.py": "def u(): pass\n",
+        "tests/test_parser.py": "from shop.parser import parse\n",
+        "tests/test_cli.py": "from shop import utils\n",
+        "tests/test_other.py": "import os\n",
+        "web/cart.ts": "export const cart = 1\n",
+        "web/cart.test.ts": "import { cart } from './cart'\n",
+        "package.json": '{"devDependencies": {"vitest": "1"}}',
+        "pyproject.toml": "",
+    }
+
+    def test_maps_changes_to_tests(self):
+        with open(os.path.join(self.dir, "src", "shop", "utils.py"), "a") as fh:
+            fh.write("# x\n")
+        out = self.run_py([AFFECTED, "--files", "src/shop/parser.py", "web/cart.ts"]).stdout
+        self.assertIn("tests/test_parser.py", out)
+        self.assertIn("web/cart.test.ts", out)
+        self.assertNotIn("test_other", out)
+        self.assertIn("pytest -q -x --tb=short tests/test_parser.py", out)
+        self.assertIn("npx vitest run web/cart.test.ts", out)
+        out = self.run_py([AFFECTED]).stdout  # working tree: utils.py changed
+        self.assertIn("tests/test_cli.py  (imports shop/utils)", out)
+        self.assertNotIn("test_parser", out)
+
+
+class BulkReplaceTest(GitRepoCase):
+    files = {"a.py": "old_name()\nold_name()\n", "b/c.py": "x = old_name\n", "d.md": "old_name\n",
+             "package-lock.json": '{"old_name": 1}'}
+
+    def test_dry_run_then_apply(self):
+        out = self.run_py([BULK, "old_name", "new_name", "--glob", "*.py"]).stdout
+        self.assertIn("3 replacement(s) in 2 file(s)", out)
+        self.assertIn("dry run", out)
+        with open(os.path.join(self.dir, "a.py")) as fh:
+            self.assertIn("old_name", fh.read())
+        self.run_py([BULK, "old_name", "new_name", "--word", "--apply"])
+        with open(os.path.join(self.dir, "a.py")) as fh:
+            self.assertEqual("new_name()\nnew_name()\n", fh.read())
+        with open(os.path.join(self.dir, "d.md")) as fh:
+            self.assertEqual("new_name\n", fh.read())
+        with open(os.path.join(self.dir, "package-lock.json")) as fh:
+            self.assertIn("old_name", fh.read())  # lockfiles untouched
+        self.assertEqual(1, self.run_py([BULK, "zzz", "y"], check=False).returncode)
+
+
+class ContextAuditTest(GitRepoCase):
+    files = {"CLAUDE.md": "# Rules\n" + "Be careful. " * 900 + "\n@docs/extra.md\n",
+             "docs/extra.md": "extra " * 100, "AGENTS.md": "# agents\n",
+             ".mcp.json": '{"mcpServers": {"playwright": {}, "db": {}, "search": {}}}'}
+
+    def test_reports_files_imports_mcp(self):
+        out = self.run_py([AUDIT]).stdout
+        self.assertIn("CLAUDE.md  <- large", out)
+        self.assertIn("docs/extra.md", out)
+        self.assertIn("playwright", out)
+        self.assertIn("3 MCP servers enabled", out)
+
+
 class SkillFormatTest(unittest.TestCase):
     def test_frontmatter(self):
         skills_dir = os.path.join(ROOT, "skills")

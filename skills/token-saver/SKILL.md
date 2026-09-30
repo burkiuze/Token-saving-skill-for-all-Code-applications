@@ -7,16 +7,17 @@ description: Core token-efficiency protocol for any coding task in a repository 
 
 Goal: the same or a better result with far fewer tokens. The savings come from **not reading what doesn't matter and never doing the same work twice**. They never come from skipping code that does matter.
 
-Sibling skills are in the same skills folder: `repo-map`, `smart-read`, `quiet-run` and `session-memory`. Their scripts live at `../<skill>/scripts/` relative to this file.
+Sibling skills are in the same skills folder: `task-triage`, `repo-map`, `smart-read`, `quiet-run`, `test-impact`, `session-memory`, `persistent-memory`, `bulk-edit`, `api-lookup` and `context-audit`. Their scripts live at `../<skill>/scripts/` relative to this file.
 
 ## The loop (every task)
-1. **Resume.** If `.codemap/SESSION.md` or `.codemap/NOTES.md` exist, read them first (they are short). Trust them. Don't re-derive what they already say.
+0. **Size it.** XS/S tasks skip the ceremony, M/L tasks get a plan. See `task-triage`.
+1. **Resume.** If `.codemap/SESSION.md` or `.codemap/NOTES.md` exist, read them first (they are short). Run `python3 ../persistent-memory/scripts/memory.py brief`, then `recall "<topic>"`. Trust verified memories. Re-check only the ones flagged `!! verify`.
 2. **Orient.** Get the layout from the code map (`repo-map`), not by crawling the tree: `python3 ../repo-map/scripts/repomap.py build` re-parses only the files that changed.
-3. **Locate.** Search before you read (`rg -n`, `repomap.py find NAME`). Know the file *and the line* before you open anything.
+3. **Locate.** Search before you read (`rg -n`, `repomap.py find NAME`). Know the file *and the line* before you open anything. For library APIs, use `api-lookup`.
 4. **Read narrowly.** Read the span you need (the function or class plus about 20 lines), not the whole file. See `smart-read`.
-5. **Edit minimally.** Use targeted edits or patches. Never rewrite a whole file to change a few lines.
-6. **Verify quietly.** Run the narrowest relevant check with capped output. See `quiet-run`.
-7. **Checkpoint.** At milestones and at the end, update `.codemap/SESSION.md`. See `session-memory`.
+5. **Edit minimally.** Use targeted edits or patches. Never rewrite a whole file to change a few lines. For the same change in many files, use `bulk-edit`.
+6. **Verify quietly.** Run the affected tests first (`test-impact`) with capped output (`quiet-run`). Run the full suite once at the end.
+7. **Checkpoint and remember.** Update `.codemap/SESSION.md` (`session-memory`). Save reusable, verified facts with `memory.py add` (`persistent-memory`).
 
 ## Hard rules
 - **Never re-read** a file that is already in context unless it has changed since. If you edited it, you already know the change. If someone else changed it, use `git diff -- <file>`.

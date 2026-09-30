@@ -24,7 +24,8 @@ $ErrorActionPreference = 'Stop'
 $RepoDir   = $PSScriptRoot
 $SkillsSrc = Join-Path $RepoDir 'skills'
 $BlockSrc  = Join-Path (Join-Path $RepoDir 'rules') 'token-saver-block.md'
-$Skills    = @('token-saver', 'repo-map', 'smart-read', 'quiet-run', 'session-memory')
+$Skills    = @('token-saver', 'task-triage', 'repo-map', 'smart-read', 'quiet-run', 'test-impact',
+               'session-memory', 'persistent-memory', 'bulk-edit', 'api-lookup', 'context-audit')
 $AllTools  = @('claude', 'codex', 'opencode', 'zcode', 'gemini', 'cursor', 'copilot')
 $Start     = '<!-- token-saver:start'
 $End       = '<!-- token-saver:end -->'

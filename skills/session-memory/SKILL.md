@@ -38,7 +38,7 @@ src/auth/token.ts, tests/auth/test_token.py
 ~~~
 
 ## Promote durable knowledge
-Some facts are useful beyond this task: build/test commands, architecture, conventions, gotchas. Move those into `.codemap/NOTES.md` (see `repo-map`). SESSION.md is per task. NOTES.md is per project.
+Some facts are useful beyond this task: build/test commands, gotchas, fixes, preferences. Save each one as an atomic, searchable entry with `python3 ../persistent-memory/scripts/memory.py add "..." --kind cmd|gotcha|fix|pref|decision`. The architecture overview belongs in `.codemap/NOTES.md` (see `repo-map`). SESSION.md is per task. Memory and NOTES.md are per project.
 
 ## Finish
 When the task is fully done, shrink SESSION.md to a 2-line "last completed: …" note, or delete it, so the next task doesn't start from stale context.

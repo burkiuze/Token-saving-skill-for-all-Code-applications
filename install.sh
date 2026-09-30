@@ -6,7 +6,7 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_SRC="$REPO_DIR/skills"
 BLOCK_SRC="$REPO_DIR/rules/token-saver-block.md"
-SKILLS=(token-saver repo-map smart-read quiet-run session-memory)
+SKILLS=(token-saver task-triage repo-map smart-read quiet-run test-impact session-memory persistent-memory bulk-edit api-lookup context-audit)
 ALL_TOOLS="claude codex opencode zcode gemini cursor copilot"
 START="<!-- token-saver:start"
 END="<!-- token-saver:end -->"
