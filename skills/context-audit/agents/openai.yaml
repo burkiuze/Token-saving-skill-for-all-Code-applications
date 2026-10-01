@@ -1,0 +1,4 @@
+interface:
+  display_name: "Context Audit"
+  short_description: "Inventory possible instruction and integration costs"
+  default_prompt: "Use $context-audit to help complete this coding task."

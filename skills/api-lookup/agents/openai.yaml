@@ -1,0 +1,4 @@
+interface:
+  display_name: "Api Lookup"
+  short_description: "Check exact installed API versions and signatures"
+  default_prompt: "Use $api-lookup to help complete this coding task."

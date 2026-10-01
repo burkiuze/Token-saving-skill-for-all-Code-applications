@@ -1,0 +1,4 @@
+interface:
+  display_name: "Context Pack"
+  short_description: "Rank relevant source within an explicit context budget"
+  default_prompt: "Use $context-pack to help complete this coding task."

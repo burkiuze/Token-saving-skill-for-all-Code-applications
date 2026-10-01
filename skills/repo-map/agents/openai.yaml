@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repo Map"
+  short_description: "Orient with an incremental multi-language symbol map"
+  default_prompt: "Use $repo-map to help complete this coding task."

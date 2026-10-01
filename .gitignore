@@ -1,2 +1,6 @@
-.codemap/
 __pycache__/
+*.py[cod]
+.codemap/
+.token-saver-state/
+*.zip
+*.sha256

@@ -1,0 +1,9 @@
+{
+  "budget": 2000,
+  "max_file_bytes": 500000,
+  "max_files": 3000,
+  "max_snippets": 12,
+  "context_lines": 4,
+  "exclude": ["fixtures/large/**", "generated/**"],
+  "priority_paths": ["src/", "lib/", "app/", "tests/"]
+}

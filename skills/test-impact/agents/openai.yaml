@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Impact"
+  short_description: "Suggest focused tests and disclose mapping limits"
+  default_prompt: "Use $test-impact to help complete this coding task."

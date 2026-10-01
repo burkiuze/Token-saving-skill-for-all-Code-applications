@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""context_audit - measure the fixed "token tax" your AI coding tools pay on EVERY request:
+"""context_audit - inventory possible fixed context overhead in AI coding tools:
 always-loaded instruction files (CLAUDE.md, AGENTS.md, GEMINI.md, imports), skill metadata,
 and MCP servers (whose tool schemas are sent with each request unless loaded on demand).
 
@@ -250,7 +250,7 @@ def main(argv=None):
                           "summary": summary}, indent=1))
         return 0
 
-    print("Fixed context paid on every request (≈ chars/4 tokens), project: %s" % root.replace(HOME, "~"))
+    print("Potential context overhead (approximate chars/4; client loading/caching varies), project: %s" % root.replace(HOME, "~"))
     if not tools:
         print("nothing found: no instruction files, skills or MCP servers")
         return 0
@@ -273,7 +273,7 @@ def main(argv=None):
         print("  (none)")
 
     if mcp:
-        print("\nMCP servers (tool schemas are sent with each request unless your client loads them on demand):")
+        print("\nConfigured MCP servers (schema sizes are unknown; clients may load tools on demand):")
         for t in tools:
             for name, src, en in mcp.get(t, []):
                 print("  %-11s %-24s %s%s" % (t, name, src, "" if en else "  (disabled)"))
@@ -290,7 +290,7 @@ def main(argv=None):
         if skills.get(t, {}).get("count", 0) > 30:
             tips.append("%s: %d skills installed; every description is loaded each session. Remove ones you never use." % (t, skills[t]["count"]))
         if s["mcp_enabled"] >= 3:
-            tips.append("%s: %d MCP servers enabled. Disable the ones this project doesn't need (Claude: `claude mcp remove NAME` or /mcp; Codex: `enabled = false`; opencode: \"enabled\": false)." % (t, s["mcp_enabled"]))
+            tips.append("%s: %d MCP servers enabled. Review whether each is used and how this client loads tool schemas; server count alone is not a token measurement." % (t, s["mcp_enabled"]))
     print("\nrecommendations:" if tips else "\nlooks lean: no action needed")
     for tip in tips:
         print("  - " + tip)

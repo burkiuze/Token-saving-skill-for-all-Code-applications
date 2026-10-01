@@ -1,0 +1,4 @@
+interface:
+  display_name: "Token Budget"
+  short_description: "Separate context estimates from reported token usage"
+  default_prompt: "Use $token-budget to help complete this coding task."

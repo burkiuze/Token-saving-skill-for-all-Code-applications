@@ -24,6 +24,11 @@ import os
 import re
 import subprocess
 import sys
+import stat
+import tempfile
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../token-saver/scripts")))
+from ts_io import eligible, redact, safe_path
 
 SKIP_DIRS = {"node_modules", "vendor", "dist", "build", "target", ".git", ".codemap", "__pycache__",
              ".next", "coverage", ".venv", "venv"}
@@ -50,7 +55,7 @@ def list_files(root):
         r = subprocess.run(["git", "-C", root, "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
                            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=60)
         if r.returncode == 0:
-            return [p for p in r.stdout.decode("utf-8", "surrogateescape").split("\0") if p]
+            return sorted(set(p for p in r.stdout.decode("utf-8", "surrogateescape").split("\0") if p))
     except (OSError, subprocess.SubprocessError):
         pass
     out = []
@@ -87,6 +92,8 @@ def main(argv=None):
     ap.add_argument("--samples", type=int, default=3)
     ap.add_argument("--max-files", type=int, default=500)
     args = ap.parse_args(argv)
+    if not args.pattern or args.max_files < 1 or args.samples < 0:
+        ap.error("pattern must be nonempty; max-files positive; samples nonnegative")
 
     pat = re.escape(args.pattern) if args.fixed else args.pattern
     if args.word:
@@ -105,13 +112,15 @@ def main(argv=None):
     paths = [os.path.relpath(os.path.abspath(p), root).replace(os.sep, "/") for p in args.path]
     changes, total, skipped = [], 0, 0
     for rel in sorted(list_files(root)):
-        if not wanted(rel, args.glob, paths):
+        if not eligible(rel) or not wanted(rel, args.glob, paths):
             continue
-        full = os.path.join(root, rel)
         try:
+            full = safe_path(root, rel)
+            if full.stat().st_size > 5_000_000:
+                continue
             with open(full, "rb") as fh:
-                data = fh.read()
-        except OSError:
+                data = fh.read(5_000_001)
+        except (OSError, ValueError):
             continue
         if b"\0" in data[:8192] or len(data) > 5_000_000:
             continue
@@ -147,7 +156,7 @@ def main(argv=None):
             ol, nl = old.splitlines(), new.splitlines()
             for i, (a, b) in enumerate(zip(ol, nl)):
                 if a != b:
-                    print("--- %s:%d\n- %s\n+ %s" % (rel, i + 1, a.strip()[:200], b.strip()[:200]))
+                    print("--- %s:%d\n- %s\n+ %s" % (rel, i + 1, redact(a.strip())[:200], redact(b.strip())[:200]))
                     shown += 1
                     break
             else:
@@ -159,9 +168,23 @@ def main(argv=None):
     if len(changes) > args.max_files:
         print("bulk_replace: refusing to touch %d files (> --max-files %d)" % (len(changes), args.max_files))
         return 3
+    for rel, _, old, _ in changes:
+        path = safe_path(root, rel)
+        if path.read_bytes() != old.encode("utf-8"):
+            print("bulk_replace: file changed during preparation; retry from a fresh preview: " + rel)
+            return 4
     for rel, _, _, new in changes:
-        with open(os.path.join(root, rel), "wb") as fh:
-            fh.write(new.encode("utf-8"))
+        path = safe_path(root, rel)
+        mode = stat.S_IMODE(path.stat().st_mode)
+        fd, temporary = tempfile.mkstemp(prefix=".bulk-replace-", dir=str(path.parent))
+        try:
+            with os.fdopen(fd, "wb") as fh:
+                fh.write(new.encode("utf-8"))
+            os.chmod(temporary, mode)
+            os.replace(temporary, path)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
     print("applied. Next: `git diff --stat`, grep for leftovers, run the affected tests.")
     return 0
 

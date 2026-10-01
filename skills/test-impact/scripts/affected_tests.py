@@ -17,6 +17,10 @@ import os
 import re
 import subprocess
 import sys
+import shlex
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../token-saver/scripts")))
+from ts_io import eligible, safe_path
 
 TEST_RX = re.compile(r"(^|/)(tests?|__tests__|specs?|e2e|integration_tests?)/|(^|/)test_[^/]+$"
                      r"|_(test|spec)\.[^/.]+$|[.-](test|spec)s?\.[^/]+$|(Tests?|IT|Spec)\.(java|kt|cs|swift|scala|php|groovy)$")
@@ -46,18 +50,24 @@ def root_dir():
 def changed_files(root, base):
     files = set()
     if base:
-        out = git(root, "diff", "--name-only", base + "...HEAD") or git(root, "diff", "--name-only", base) or ""
-        files.update(out.split())
-    for args in (("diff", "--name-only"), ("diff", "--name-only", "--cached"),
-                 ("ls-files", "--others", "--exclude-standard")):
-        files.update((git(root, *args) or "").split())
+        resolved = git(root, "rev-parse", "--verify", "--end-of-options", base + "^{commit}")
+        merge = git(root, "merge-base", resolved.strip(), "HEAD") if resolved else None
+        if not merge:
+            raise ValueError("invalid base or no common ancestor: " + base)
+        out = git(root, "diff", "--no-ext-diff", "--no-textconv", "--name-only", "-z", merge.strip(), "HEAD")
+        files.update((out or "").split("\0"))
+    for args in (("diff", "--no-ext-diff", "--no-textconv", "--name-only", "-z"),
+                 ("diff", "--no-ext-diff", "--no-textconv", "--name-only", "-z", "--cached"),
+                 ("ls-files", "-z", "--others", "--exclude-standard")):
+        files.update((git(root, *args) or "").split("\0"))
+    files.discard("")
     return sorted(files)
 
 
 def all_files(root):
-    out = git(root, "ls-files", "--cached", "--others", "--exclude-standard")
+    out = git(root, "ls-files", "-z", "--cached", "--others", "--exclude-standard")
     if out is not None:
-        return [f for f in out.splitlines() if f and "node_modules/" not in f]
+        return sorted(set(f for f in out.split("\0") if f and eligible(f)))
     res = []
     for d, dirs, fs in os.walk(root):
         dirs[:] = [x for x in dirs if not x.startswith(".") and x not in ("node_modules", "vendor", "dist", "build", "target")]
@@ -100,9 +110,9 @@ def find_tests(root, changed, files):
     def content(t):
         if t not in contents:
             try:
-                with open(os.path.join(root, t), encoding="utf-8", errors="replace") as fh:
+                with open(safe_path(root, t), encoding="utf-8", errors="replace") as fh:
                     contents[t] = fh.read(200_000)
-            except OSError:
+            except (OSError, ValueError):
                 contents[t] = ""
         return contents[t]
 
@@ -189,15 +199,15 @@ def commands(root, hits, go_pkgs, rust, fw):
     cmds = []
     py = by_ext.get("py", [])
     if py:
-        cmds.append("pytest -q -x --tb=short " + " ".join(py))
+        cmds.append("pytest -q -x --tb=short " + " ".join(shlex.quote(p) for p in py))
     js = [t for e in ("ts", "tsx", "js", "jsx", "mjs", "cjs", "mts", "cts") for t in by_ext.get(e, [])]
     if js:
         if "vitest" in fw:
-            cmds.append("npx vitest run " + " ".join(js))
+            cmds.append("npx vitest run " + " ".join(shlex.quote(p) for p in js))
         elif "jest" in fw:
-            cmds.append("npx jest --silent " + " ".join(js))
+            cmds.append("npx jest --silent " + " ".join(shlex.quote(p) for p in js))
         elif "mocha" in fw:
-            cmds.append("npx mocha --reporter dot " + " ".join(js))
+            cmds.append("npx mocha --reporter dot " + " ".join(shlex.quote(p) for p in js))
         else:
             cmds.append("<your js test runner> " + " ".join(js))
     if go_pkgs:
@@ -245,8 +255,18 @@ def main(argv=None):
     hits, go_pkgs, rust = find_tests(root, changed, all_files(root))
     fw = detect(root)
     cmds = commands(root, hits, go_pkgs, rust, fw)
+    reasons = []
+    if not hits and not go_pkgs and not rust:
+        reasons.append("no direct tests mapped; run the nearest package/module suite")
+    if any(os.path.basename(p) in ("package.json", "pyproject.toml", "go.mod", "Cargo.toml",
+                                   "conftest.py", "pytest.ini", "tsconfig.json")
+           or "migration" in p.lower() or "schema" in p.lower() for p in changed):
+        reasons.append("configuration/dependency/schema changes can affect unrelated modules")
+    reasons.append("selection uses naming/direct import heuristics; indirect and dynamic dependencies may be missed")
     if args.json:
-        print(json.dumps({"changed": changed, "tests": hits, "go_packages": go_pkgs, "commands": cmds}, indent=1))
+        print(json.dumps({"changed": changed, "tests": hits, "go_packages": go_pkgs, "commands": cmds,
+                          "selection": "heuristic", "broader_validation_reasons": reasons,
+                          "commands_shell": "POSIX examples; adapt quoting for Windows"}, indent=1))
         return 0
     print("changed: %d file(s): %s%s" % (len(changed), " ".join(changed[:12]), " …" if len(changed) > 12 else ""))
     if hits:
@@ -260,7 +280,8 @@ def main(argv=None):
         for c in cmds:
             print("  " + c)
     else:
-        print("no mapped tests found -> run the nearest package/module test suite, then the full suite before finishing")
+        print("no mapped tests found -> run the nearest package/module suite and the project's required checks")
+    print("selection is heuristic; broaden for shared/config/schema changes and required project checks")
     return 0
 
 
@@ -269,3 +290,6 @@ if __name__ == "__main__":
         sys.exit(main())
     except BrokenPipeError:
         sys.exit(0)
+    except (OSError, ValueError) as error:
+        print("affected_tests: " + str(error), file=sys.stderr)
+        sys.exit(2)

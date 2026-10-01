@@ -1,0 +1,4 @@
+interface:
+  display_name: "Token Saver"
+  short_description: "Reduce repeated exploration while keeping verification"
+  default_prompt: "Use $token-saver to help complete this coding task."

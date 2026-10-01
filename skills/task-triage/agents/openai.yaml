@@ -1,0 +1,4 @@
+interface:
+  display_name: "Task Triage"
+  short_description: "Match coding workflow effort to task scope and risk"
+  default_prompt: "Use $task-triage to help complete this coding task."

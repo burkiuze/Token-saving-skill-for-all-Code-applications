@@ -296,7 +296,7 @@ class MemoryTest(GitRepoCase):
         self.assertIn("removed p1", self.run_py([MEMORY, "forget", "p1"]).stdout)
         self.assertEqual(1, self.run_py([MEMORY, "recall", "pytest"], check=False).returncode)
         with open(os.path.join(self.dir, ".codemap", ".gitignore")) as fh:
-            self.assertIn("!memory.jsonl", fh.read())
+            self.assertNotIn("!memory.jsonl", fh.read())
 
 
 class AffectedTestsTest(GitRepoCase):

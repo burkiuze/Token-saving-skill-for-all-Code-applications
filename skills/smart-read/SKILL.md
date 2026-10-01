@@ -1,41 +1,25 @@
 ---
 name: smart-read
-description: Locate-then-read protocol for reading exactly the code you need (search, then outline, then line-range reads) instead of opening whole files. Use whenever you are about to open, cat or view a source file, look for where something is implemented, trace a bug through calls, or review a diff.
+description: Locate source and read complete relevant spans with evidence. Use for symbol lookup, call tracing or large source files; avoid unrelated full-file dumps.
 ---
 
 # Smart Read
 
-Read like a debugger, not like a novel. The order is **find, then outline, then read the span**.
+Resolve `../token-saver/scripts/token_saver.py` from this skill directory and run its absolute path in the target repository.
 
-## 1. Find (no file opened yet)
-- Definition: `python3 ../repo-map/scripts/repomap.py find Name`, or `rg -n "(def|function|class|func|fn|interface|type|struct) +Name\b"`
-- Usages: `rg -n -w Name -g '!**/*test*' | head -n 40`. Narrow with `--type ts` or `-g 'src/**'`.
-- An error or text string: `rg -n -F "exact message"`
-- If you're unsure how widespread something is, count first: `rg -c pattern | sort -t: -k2 -nr | head`
-- `rg` already skips git-ignored files. Add `-g '!*.min.*' -g '!**/dist/**'` if needed.
+1. Find the file and definition: `rg -n -w Symbol src/`, or `repo-map find Symbol` when installed.
+2. Read the complete implementation before editing. A small file can be cheaper to read once than many fragments.
+3. Check callers and imports that affect the behavior being changed. Follow one dependency at a time.
 
-## 2. Outline (still cheap)
-`python3 ../repo-map/scripts/repomap.py outline path/file` lists every symbol with its line number.
-Fallback: `rg -n "^\s*(export |pub |public |private |static |async )*(def|class|function|func|fn|interface|type|struct|enum|impl) " path/file`
+```bash
+python3 <toolkit> read src/auth.py --symbol TokenService.refresh
+python3 <toolkit> read src/auth.ts --start 120 --end 190 --budget 3000
+```
 
-## 3. Read the span
-- Use your read tool's offset/limit, or `sed -n '120,180p' file`. Take the symbol plus about 10–20 lines of context, and extend only if the code continues.
-- Read the file header or imports (first ~30 lines) only when you need types or dependencies.
-- Read the whole file only when it's small (under about 150 lines), when you'll restructure it, or when three slices still miss context.
+Python symbol reads use AST boundaries including decorators and async bodies. Ambiguous names require a qualified class/function name. Other languages use explicit line ranges; `repo-map outline FILE` can help locate them.
 
-## Tracing
-Go one hop at a time. Read the function, `rg` the one callee you need, then read that span. Don't pre-load a call graph "just in case".
+A requested span that exceeds the budget fails clearly. Increase `--budget` or choose deliberate smaller ranges; never treat a truncated body as complete. The output includes source hash and original line numbers. Changed source or lost context warrants a fresh read.
 
-## Reviewing changes
-Start with `git diff --stat`, then `git diff -U3 -- <file>` one file at a time. Don't dump a diff of more than about 300 lines at once. For a PR, list the files first and read the risky ones.
+Skip generated, vendored, minified, lock and build files unless they are the subject of the task. Read configuration/schema/fixtures when they determine behavior. The reader rejects credential files, symlinks, outside-project paths, binaries and oversized files; common inline credentials are redacted.
 
-## Never read (unless the task is about them)
-- Lockfiles (package-lock, yarn.lock, pnpm-lock, Cargo.lock, poetry.lock, go.sum)
-- `node_modules`, `vendor`, `dist`, `build`, `target`, `.next`, coverage
-- Minified or bundled files, source maps, snapshots
-- Generated code (protobuf, OpenAPI clients)
-
-For big data files (JSON, CSV, logs), sample instead: `head -n 20`, `wc -l`, `jq 'keys'`.
-
-## Memory hygiene
-Keep a running list of what you've read: `path:lines → key fact`, in your working notes or `.codemap/SESSION.md`. Check that list before reading anything. Re-reading costs the full price again.
+Without Python, use a bounded read tool or `sed -n '120,190p' FILE`, ensuring the complete function is visible. Install the `token-saver` sibling for the executable reader.

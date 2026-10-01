@@ -1,0 +1,4 @@
+interface:
+  display_name: "Diff Review"
+  short_description: "Review bounded changes with their scope and omissions"
+  default_prompt: "Use $diff-review to help complete this coding task."

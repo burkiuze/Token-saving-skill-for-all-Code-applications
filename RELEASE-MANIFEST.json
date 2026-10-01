@@ -1,0 +1,354 @@
+{
+  "release": "2.0.0",
+  "source_commit": "67d8bf953b0b50a1bdefd06249a9492b4521f853",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "4c2acad352d7e03dc8b44cadc11704245bb612043db4ed14f48812eb51b8b5a7",
+      "bytes": 83,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "23fc902e5ef4713a5e685f48ac93448f856da658e6de9f4d0eee63d84eea7e8b",
+      "bytes": 823,
+      "mode": "100644"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "af400486fce2f8dda255e504aa78ddd30e29a04efd6e69db3455590bc38e8ed6",
+      "bytes": 68,
+      "mode": "100644"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "dcb14fad54e79c86752b982dc41c295e0ee35b4052032f7b5df1d683d480e436",
+      "bytes": 847,
+      "mode": "100644"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "mode": "100644"
+    },
+    {
+      "path": "README.md",
+      "sha256": "e3703b9e7ca601ef4fc2a8e483660fcbf9200e7a5f69eb7f4fe5755ac652da92",
+      "bytes": 12100,
+      "mode": "100644"
+    },
+    {
+      "path": "VERSION",
+      "sha256": "c28fcca53637bc88e124af1725df13cb98c69dedefd62fb3cdbe1cdb6b760624",
+      "bytes": 6,
+      "mode": "100644"
+    },
+    {
+      "path": "benchmarks/benchmark.py",
+      "sha256": "26997165214fe4993527e90c1dccadff39673eed180a0d9c97efbe6585eb0e96",
+      "bytes": 3822,
+      "mode": "100644"
+    },
+    {
+      "path": "benchmarks/results.json",
+      "sha256": "bc07e528b7ae3c534ea1113ec815a333c31ba46a7e012b39e23c6cd40c7e08ad",
+      "bytes": 651,
+      "mode": "100644"
+    },
+    {
+      "path": "examples/retrieval-config.json",
+      "sha256": "10666b5254a747e8e8130d45f1eebd3e5aa41ddd098b79df3202d73897f82045",
+      "bytes": 222,
+      "mode": "100644"
+    },
+    {
+      "path": "install.ps1",
+      "sha256": "8a433548cd0c1cceba3b2a5ec1de1641c476fdcc9a0152ee060e5b3312019154",
+      "bytes": 1254,
+      "mode": "100644"
+    },
+    {
+      "path": "install.py",
+      "sha256": "2f8a5836d3acaf8fa68cacfa4617f4dc5756aff5a35ec38848306392e14fb0d6",
+      "bytes": 15569,
+      "mode": "100644"
+    },
+    {
+      "path": "install.sh",
+      "sha256": "20123ce19bb3180aafe5f1434c7ebe5887befb0b2e94e5eea2d7a74f9ff272fa",
+      "bytes": 462,
+      "mode": "100755"
+    },
+    {
+      "path": "rules/token-saver-block.md",
+      "sha256": "9eac52475111ab38f796c99530da7203d1b0567984ed198bb2624f0805641e2d",
+      "bytes": 1073,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/api-lookup/SKILL.md",
+      "sha256": "5e37cc89638a3a81d51812e677115cda9a04955aa85510ae24985157e4e0229e",
+      "bytes": 1521,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/api-lookup/agents/openai.yaml",
+      "sha256": "9b44c3b451a905ccba7656032246308969e9a60fe2208ea37b20b4b7b7d8a16e",
+      "bytes": 184,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/bulk-edit/SKILL.md",
+      "sha256": "b9f9670877323aca7412acfd79b996bcf483906d167a75240d00251db472e48e",
+      "bytes": 1586,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/bulk-edit/agents/openai.yaml",
+      "sha256": "6a44cf0eb392b9b53777447a49ed6ed0da78591e7cc042c725ae05382c3f15cd",
+      "bytes": 183,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/bulk-edit/scripts/bulk_replace.py",
+      "sha256": "5d333f5d871cd847c53c7c1775007f1eb89ac0861ba5948ce85142556bdcd1b5",
+      "bytes": 8176,
+      "mode": "100755"
+    },
+    {
+      "path": "skills/context-audit/SKILL.md",
+      "sha256": "26eab16a948b639b127f38c405668f9540b3821eb0ba8cdb1924e1f6dae5abbd",
+      "bytes": 1593,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/context-audit/agents/openai.yaml",
+      "sha256": "75b231f11877015cb374d20c047d5184102902519335d0ba60d5d45509010947",
+      "bytes": 193,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/context-audit/scripts/context_audit.py",
+      "sha256": "4785bc77c5d29e056bd0d85df4e91322f0f2bc0dc6b106d57ea0579fafc4d026",
+      "bytes": 12706,
+      "mode": "100755"
+    },
+    {
+      "path": "skills/context-pack/SKILL.md",
+      "sha256": "3f8f94ea97aaf53da890341601db0ebca64be09283270dcbcd178b68d1b6215f",
+      "bytes": 1747,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/context-pack/agents/openai.yaml",
+      "sha256": "4e59c7b413498abf3ef7d9a4af0e6c398670fe0171f4fcff8e7cad0a9525af4d",
+      "bytes": 193,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/diff-review/SKILL.md",
+      "sha256": "94baf3d450e332c672e6b781c6ee2e949c55c5295b5406c15398d1185091ae9e",
+      "bytes": 1592,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/diff-review/agents/openai.yaml",
+      "sha256": "8cffb19682d23053ca26cfe5d95c58c3acee619f2f7d67886ffbb969bbf77f93",
+      "bytes": 190,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/persistent-memory/SKILL.md",
+      "sha256": "f20cb91f0803958ff05aa6ff35561254a981f13298fd807daa615d562275cda7",
+      "bytes": 1814,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/persistent-memory/agents/openai.yaml",
+      "sha256": "72d40a615f4d28d1e088636baa7b69f8a64bb7c53696a087a7542db9d03b1873",
+      "bytes": 195,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/persistent-memory/scripts/memory.py",
+      "sha256": "e56a131e30e9c312455a17f89275c4e3cb7dc3096e92822d46de45cebe93493b",
+      "bytes": 18375,
+      "mode": "100755"
+    },
+    {
+      "path": "skills/quiet-run/SKILL.md",
+      "sha256": "4656f24b792e8079a5fc68e9e47762dd16584665dc9db0e446101db10fd90a1e",
+      "bytes": 1525,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/quiet-run/agents/openai.yaml",
+      "sha256": "ec6209bc269d0a4042b50efa0c1ae6e3ccf201ad381f9114589bc5f51fbe5b38",
+      "bytes": 186,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/quiet-run/scripts/quiet_run.py",
+      "sha256": "13444514ac2f5222fe2b1f9ee4b6ef4e1c335872973c4cb99c41f185c1e82fcf",
+      "bytes": 12911,
+      "mode": "100755"
+    },
+    {
+      "path": "skills/repo-map/SKILL.md",
+      "sha256": "2017e2509ab3ddbf1d96aa0ae1f56c23eb9c498724b0443517959077afec7cea",
+      "bytes": 1554,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/repo-map/agents/openai.yaml",
+      "sha256": "dc0395c5a5d3006958df16432fb42b69998c93a58533df2bfdd58be4c36213df",
+      "bytes": 183,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/repo-map/scripts/repomap.py",
+      "sha256": "1a113f86ab404df24a44062dfdb600ed32bb37561a68caced391aa4e5737fec9",
+      "bytes": 37496,
+      "mode": "100755"
+    },
+    {
+      "path": "skills/repo-map/templates/NOTES.md",
+      "sha256": "3a200ee25fc73b09d6a84d3192e909d73dc3764242fc2723e33066e987afd951",
+      "bytes": 606,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/session-memory/SKILL.md",
+      "sha256": "c85e2bbebab50c39034f87a884ce346478a53f86a4144dafa669b7cff3310fe2",
+      "bytes": 1454,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/session-memory/agents/openai.yaml",
+      "sha256": "7e9c5a9ea2f809ce39b0ef2156a5fea301be37449e4c70bebe1e96b9f558b86d",
+      "bytes": 191,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/smart-read/SKILL.md",
+      "sha256": "3981a43e9f35dccbc635cf62810475c6f17e42656b1e314b7ff5356ab2453ea3",
+      "bytes": 1769,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/smart-read/agents/openai.yaml",
+      "sha256": "032e7290097d9fe2a39dc87faf5f0ebedd3f04ca68d143b8163c724f63897116",
+      "bytes": 189,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/task-triage/SKILL.md",
+      "sha256": "46234c0a36644a87f67025f1360b38383a06426c088111f35f4bd948434cef9b",
+      "bytes": 1543,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/task-triage/agents/openai.yaml",
+      "sha256": "7cbc9023f299963b5186a1c22e313b19431d138aa8526cd3ac0e3f08fc7ff2dd",
+      "bytes": 188,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/test-impact/SKILL.md",
+      "sha256": "373f8e3bed4a32438044a796a89f5fcdd5f7a11af0ab587d530b5ec69a474f20",
+      "bytes": 1468,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/test-impact/agents/openai.yaml",
+      "sha256": "6b905dbebf5b7f35daf9b05798d2772b97d05bb30f19854c81e315ae7ae8bbac",
+      "bytes": 186,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/test-impact/scripts/affected_tests.py",
+      "sha256": "b5479b7088657c805027309046eae640c0ee06ca9e36b176ae77356b9d739413",
+      "bytes": 12683,
+      "mode": "100755"
+    },
+    {
+      "path": "skills/token-budget/SKILL.md",
+      "sha256": "ae6ab7af9719751bd8961f0c52d7e12a1992fd230e9376edadadd0f3edf70ff0",
+      "bytes": 1581,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/token-budget/agents/openai.yaml",
+      "sha256": "fd2234d9ddbc4a902122e785f02992881420c5ba1b0bf2c3b7305b35e6338143",
+      "bytes": 191,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/token-saver/SKILL.md",
+      "sha256": "0a8ab9a54929590ca7c65eb73cf2adece23dbd93ca3dc5d07c37c73359d514b4",
+      "bytes": 3120,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/token-saver/agents/openai.yaml",
+      "sha256": "67ba994383fe751b126c814c0d92831285c97951dbde9510a0e4d0d801b61001",
+      "bytes": 191,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/token-saver/references/configuration.md",
+      "sha256": "9f847e6d514e58cf150f8abb60dc9b27260c14594042849856a29f0d75b01b7a",
+      "bytes": 1792,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/token-saver/references/workflows.md",
+      "sha256": "6d89f42734f9b67bc0c8b8040d0eb425188129d651ebe1495e9edb9784390c16",
+      "bytes": 3016,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/token-saver/scripts/token_saver.py",
+      "sha256": "c2fbdb952fe19f5c0c04880255db9250eccb910012a5c461617accc24fe52257",
+      "bytes": 20336,
+      "mode": "100644"
+    },
+    {
+      "path": "skills/token-saver/scripts/ts_io.py",
+      "sha256": "9db60ff90653207885251e380fe5377b6c0d10b75f1cfcf92d3aac09f277c71b",
+      "bytes": 7964,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/test_installer.py",
+      "sha256": "8384e44ce61319e209ed4f527f24c20c3ff25d0785685bdfa5e784792fb05141",
+      "bytes": 7858,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/test_scripts.py",
+      "sha256": "6938b036bff38a0505ad0a041e5769c27d59065fc16f2174d8491b4cd9f592ad",
+      "bytes": 17037,
+      "mode": "100644"
+    },
+    {
+      "path": "tests/test_toolkit.py",
+      "sha256": "2546bf6cbb4a4a56109732d2712347fdbea0118ed47bfdcab3c3383595327ffd",
+      "bytes": 16967,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/package_release.py",
+      "sha256": "347e3835bd8ec757cd1baa35b87eb2d332aad228c99338908e3ad68ee60f9816",
+      "bytes": 3222,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/validate_skills.py",
+      "sha256": "f2f40ebf93d954784cb73dcaa804ccbdfdd7d852ac8700bca6e2a7d160f69f79",
+      "bytes": 2450,
+      "mode": "100644"
+    }
+  ]
+}

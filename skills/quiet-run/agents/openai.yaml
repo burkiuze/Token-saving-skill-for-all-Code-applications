@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quiet Run"
+  short_description: "Retain diagnostics while capping noisy command output"
+  default_prompt: "Use $quiet-run to help complete this coding task."

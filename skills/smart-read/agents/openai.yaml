@@ -1,0 +1,4 @@
+interface:
+  display_name: "Smart Read"
+  short_description: "Read complete relevant source spans with line evidence"
+  default_prompt: "Use $smart-read to help complete this coding task."

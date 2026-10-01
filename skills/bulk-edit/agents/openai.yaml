@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bulk Edit"
+  short_description: "Preview scoped edits while preserving user changes"
+  default_prompt: "Use $bulk-edit to help complete this coding task."

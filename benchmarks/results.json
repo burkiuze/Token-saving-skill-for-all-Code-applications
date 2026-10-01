@@ -1,0 +1,25 @@
+{
+  "method": "Synthetic content-size benchmark; UTF-8 bytes / 4 heuristic, not billed tokens or total task savings",
+  "fixture": {
+    "source_files": 41,
+    "noise_functions": 4000,
+    "noisy_log_lines": 2003
+  },
+  "context_pack": {
+    "baseline_source_bytes": 306308,
+    "packet_bytes": 622,
+    "baseline_estimated_tokens": 76577,
+    "packet_estimated_tokens": 156,
+    "target_complete": true,
+    "budget": 1800
+  },
+  "quiet_run": {
+    "raw_log_bytes": 32968,
+    "summary_bytes": 143,
+    "raw_estimated_tokens": 8242,
+    "summary_estimated_tokens": 36,
+    "summary_lines": 4,
+    "failure_preserved": true,
+    "exit_code": 3
+  }
+}

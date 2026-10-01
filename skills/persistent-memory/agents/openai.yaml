@@ -1,0 +1,4 @@
+interface:
+  display_name: "Persistent Memory"
+  short_description: "Recall verified facts with source drift checks"
+  default_prompt: "Use $persistent-memory to help complete this coding task."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Session Memory"
+  short_description: "Checkpoint long tasks for resumption and handoff"
+  default_prompt: "Use $session-memory to help complete this coding task."
